@@ -2,11 +2,9 @@
 
 # AdaptEase_AI
 
-AdaptEase_AI is an innovative AI-powered solution aimed at [briefly describe the purpose or functionality of the project]. This repository contains the source code for building and running the project.
+AdaptEase_AI is an innovative AI-powered solution aimed at providing easy learning. This repository contains the source code for building and running the project.
 
-## Features
-- [List key features of your project]
-- [Include AI components and any specific functionalities]
+
 
 ## Installation
 
