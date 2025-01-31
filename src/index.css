@@ -1,0 +1,13 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Mermaid diagram styles */
+.mermaid {
+  background: white;
+}
+
+.mermaid svg {
+  max-width: 100%;
+  height: auto;
+}
