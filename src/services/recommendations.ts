@@ -1,33 +1,47 @@
 import { UserPreferences, LearningPath } from '../types';
 
+const difficultyMap = {
+  beginner: 1,
+  intermediate: 2,
+  advanced: 3
+};
+
+// Convert duration from string to numeric weeks
+const parseDuration = (duration: string): number => {
+  const match = duration.match(/\d+/);
+  return match ? parseInt(match[0], 10) : 0;
+};
+
 function calculatePathScore(path: LearningPath, preferences: UserPreferences): number {
   let score = 0;
 
-  // Time availability score
-  if (preferences.availableTime === 'minimal' && path.duration <= '12 weeks') score += 3;
-  else if (preferences.availableTime === 'moderate' && path.duration <= '16 weeks') score += 2;
+  // ✅ Time availability score
+  const duration = parseDuration(path.duration);
+  if (preferences.availableTime === 'minimal' && duration <= 12) score += 3;
+  else if (preferences.availableTime === 'moderate' && duration <= 16) score += 2;
   else if (preferences.availableTime === 'extensive') score += 1;
 
-  // Difficulty level score
-  const difficultyMap = {
-    beginner: 1,
-    intermediate: 2,
-    advanced: 3
-  };
+  // ✅ Difficulty level score
+  const targetDifficulty = preferences.goals.some(goal =>
+    goal.toLowerCase().includes(path.difficulty.toLowerCase())
+  );
+  if (targetDifficulty) {
+    score += difficultyMap[path.difficulty] * 2; // Weighted score for difficulty relevance
+  }
 
-  // Check if any goals mention specific levels
-  const goalText = preferences.goals.join(' ').toLowerCase();
-  if (goalText.includes('beginner') && path.difficulty === 'beginner') score += 2;
-  if (goalText.includes('advanced') && path.difficulty === 'advanced') score += 2;
-
-  // Skills matching score
+  // ✅ Skills matching score
   path.skills.forEach(skill => {
-    if (preferences.goals.some(goal => 
+    if (preferences.goals.some(goal =>
       goal.toLowerCase().includes(skill.name.toLowerCase())
     )) {
-      score += 2;
+      score += 3; // Increase weight for skill relevance
     }
   });
+
+  // ✅ AI-based relevance boost (if available)
+  // You can call the AI model here to adjust the score dynamically based on AI feedback.
+  // Example:
+  // score += await getAIRelevanceBoost(path, preferences);
 
   return score;
 }
@@ -36,13 +50,12 @@ export function generateLearningRecommendations(
   preferences: UserPreferences,
   availablePaths: LearningPath[]
 ): LearningPath[] {
-  // Score each path based on user preferences
   const scoredPaths = availablePaths.map(path => ({
     path,
     score: calculatePathScore(path, preferences)
   }));
 
-  // Sort paths by score and return top matches
+  // ✅ Sort paths by score (higher is better) and return top matches
   return scoredPaths
     .sort((a, b) => b.score - a.score)
     .map(({ path }) => path);
